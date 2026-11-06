@@ -1,10 +1,11 @@
 import os
 import requests
 import time
+import subprocess
 
-endpoint = os.getenv("AUTTER_ENDPOINT", "https://otlp.autter.dev")
-api_key = "autter_rt_6e5e06b0b211fe45a88bd15ffe1624f1b86e5af4d489e683"
-git_sha = os.getenv("GIT_SHA", "unknown-sha")
+endpoint = "https://otlp.autter.dev"
+api_key = "autter_rt_6e5e06b0b211fe45a88bd15ffe1624f1b86e5af4d489e683"  # <-- PASTE YOUR KEY HERE
+git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 
 def send_error(message, trace_id, span_id):
     payload = {
@@ -43,8 +44,9 @@ def send_error(message, trace_id, span_id):
     )
     print(f"Sent: '{message}' -> HTTP {res.status_code}")
 
-# Send Bug A
-send_error("Negative number error for batch 9841", "11111111111111111111111111111111", "1111111111111111")
-time.sleep(2)
-# Send Bug B (completely different root cause, but same error type and file)
-send_error("Buffer overflow error for transaction 1205", "22222222222222222222222222222222", "2222222222222222")
+print("[Test 2] Sending two distinct errors with dynamic numbers...")
+# Bug A (Batch 9841)
+send_error("Negative number error for batch 9841", "20000000000000000000000000000002", "2000000000000002")
+time.sleep(1)
+# Bug B (Transaction 1205)
+send_error("Buffer overflow error for transaction 1205", "30000000000000000000000000000003", "3000000000000003")
