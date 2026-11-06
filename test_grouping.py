@@ -3,7 +3,7 @@ import requests
 import time
 
 endpoint = os.getenv("AUTTER_ENDPOINT", "https://otlp.autter.dev")
-api_key = os.getenv("AUTTER_RUNTIME_KEY", "")
+api_key = "autter_rt_6e5e06b0b211fe45a88bd15ffe1624f1b86e5af4d489e683"
 git_sha = os.getenv("GIT_SHA", "unknown-sha")
 
 def send_error(message, trace_id, span_id):
