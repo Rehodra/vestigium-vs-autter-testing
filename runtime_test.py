@@ -1,13 +1,18 @@
 import os
 import requests
 import time
+import subprocess
 
-endpoint = os.getenv("AUTTER_ENDPOINT", "https://otlp.autter.dev")
-api_key = os.getenv("AUTTER_RUNTIME_KEY", "")
-git_sha = os.getenv("GIT_SHA", "unknown-sha")
+# 1. Configuration
+endpoint = "https://otlp.autter.dev"
+api_key = "autter_rt_6e5e06b0b211fe45a88bd15ffe1624f1b86e5af4d489e683"  # <-- PASTE YOUR KEY HERE
 
-print(f"Sending test error to {endpoint} for commit {git_sha[:8]}...")
+# Automatically get the current commit SHA from git
+git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 
+print(f"[Test 1] Sending crash for commit {git_sha[:8]}...")
+
+# 2. Build OpenTelemetry Trace Payload
 payload = {
     "resourceSpans": [{
         "resource": {
@@ -18,8 +23,8 @@ payload = {
         },
         "scopeSpans": [{
             "spans": [{
-                "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
-                "spanId": "00f067aa0ba902b7",
+                "traceId": "10000000000000000000000000000001",
+                "spanId": "1000000000000001",
                 "name": "GET /api/factorial",
                 "kind": 1,
                 "startTimeUnixNano": int(time.time() * 1e9),
@@ -38,14 +43,10 @@ payload = {
     }]
 }
 
-response = requests.post(
+# 3. Send to Autter Runtime
+res = requests.post(
     f"{endpoint}/v1/traces",
-    headers={
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    },
+    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
     json=payload
 )
-
-print(f"HTTP Status: {response.status_code}")
-print(f"Server Response: {response.text}")
+print(f"Server Response: HTTP {res.status_code}")
